@@ -7,7 +7,7 @@
 > from `storage.rules`; the custom claim is now the ONLY admin mechanism for
 > both Firestore and Storage. `administrator@simplysoph.com` was granted
 > `role: admin` out-of-band via the Admin SDK. `sophia@simplysoph.com` and
-> `saulpatinojr@gmail.com` do NOT yet hold the claim \u2014 grant them by signing
+> the owner's personal account do NOT yet hold the claim \u2014 grant them by signing
 > in as `administrator@simplysoph.com` and calling the `setAdminClaim`
 > callable (or via the Admin SDK). Users must sign out/in after a grant for
 > the new token to take effect.
