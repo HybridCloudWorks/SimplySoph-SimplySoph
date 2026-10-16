@@ -1,0 +1,12 @@
+title: SimplySoph
+description: "SimplySoph creator website (simplysoph.com): blog, looks, photos, videos and travel journal with an admin CMS."
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+plugins:
+  - jekyll-remote-theme
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: false
+search_enabled: true
+aux_links:
+  "View on GitHub": "https://github.com/HybridCloudWorks/SimplySoph-SimplySoph"
