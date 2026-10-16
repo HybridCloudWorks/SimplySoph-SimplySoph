@@ -86,8 +86,9 @@ domains, etc.). Audit config.ts and main.tsx before every CI run to verify.
    `https://app.terraform.io`, attribute condition on org/workspace **name**
    (HCW learned the org-ID claim doesn't match — match names).
 4. **GitHub Actions WIF** (one-time `gcloud`): pool + provider trusting
-   `https://token.actions.githubusercontent.com`, condition on
-   `repository == 'saulpatinojr/SimplySoph-SimplySoph'`; deploy SA gets
+   `https://token.actions.githubusercontent.com`, condition on the
+   repository and owner IDs of `HybridCloudWorks/SimplySoph-SimplySoph`
+   (see `platform/terraform/wif.tf`); deploy SA gets
    `firebasehosting.admin`, `cloudfunctions.developer`, `firebaserules.admin`,
    `datastore.indexAdmin`, `iam.serviceAccountUser` on the runtime SA — then
    swap `deploy.yml` to `google-github-actions/auth` with

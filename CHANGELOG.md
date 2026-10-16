@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased] — 2026-07-13
+
+### Changed
+- Migrated completed items from `implementation_plan.md` into this changelog and moved remaining implementation plan items into `todo.md`. Deleted `implementation_plan.md` to avoid divergence — all open work is now tracked in `todo.md`.
+
+---
+
 ## [0.2.1-beta] — 2026-07-12
 
 ### Added
@@ -154,11 +161,4 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Firebase Hosting deploy workflow with preview channels
 - Firestore security rules
 - Algolia search integration
-
----
-
-## [Unreleased] — 2026-07-13
-
-### Changed
-- Migrated completed items from `implementation_plan.md` into this changelog and moved remaining implementation plan items into `todo.md`. Deleted `implementation_plan.md` to avoid divergence — all open work is now tracked in `todo.md`.
 

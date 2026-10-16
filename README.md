@@ -1,9 +1,11 @@
-# SimplySoph — v0.2.0-beta
+# SimplySoph — v0.2.1-beta
 
 > Personal creative platform for Sophie — blog, photo albums, travel journal, and social media integration.
 
-[![Build & Deploy](https://github.com/saulpatinojr/SimplySoph-SimplySoph/actions/workflows/deploy.yml/badge.svg)](https://github.com/saulpatinojr/SimplySoph-SimplySoph/actions/workflows/deploy.yml)
-[![Lighthouse CI](https://github.com/saulpatinojr/SimplySoph-SimplySoph/actions/workflows/lighthouse.yml/badge.svg)](https://github.com/saulpatinojr/SimplySoph-SimplySoph/actions/workflows/lighthouse.yml)
+[![Build & Deploy](https://github.com/HybridCloudWorks/SimplySoph-SimplySoph/actions/workflows/deploy.yml/badge.svg)](https://github.com/HybridCloudWorks/SimplySoph-SimplySoph/actions/workflows/deploy.yml)
+[![Lighthouse CI](https://github.com/HybridCloudWorks/SimplySoph-SimplySoph/actions/workflows/lighthouse.yml/badge.svg)](https://github.com/HybridCloudWorks/SimplySoph-SimplySoph/actions/workflows/lighthouse.yml)
+
+**Documentation:** [hybridcloudworks.github.io/SimplySoph-SimplySoph](https://hybridcloudworks.github.io/SimplySoph-SimplySoph/)
 
 ---
 
@@ -24,9 +26,11 @@
 
 ## Quick Start
 
+**Prerequisites:** Node.js 20 (the version CI uses) and npm.
+
 ```bash
 # 1. Clone
-git clone https://github.com/saulpatinojr/SimplySoph-SimplySoph.git
+git clone https://github.com/HybridCloudWorks/SimplySoph-SimplySoph.git
 cd SimplySoph-SimplySoph
 
 # 2. Install dependencies
@@ -67,7 +71,7 @@ VITE_ALGOLIA_APP_ID=
 VITE_ALGOLIA_SEARCH_KEY=
 ```
 
-> For CI/CD secrets see the [GitHub Wiki → Secrets & Variables](../../wiki/Secrets-and-Variables).
+> For CI/CD secrets see [Docs → Secrets & Variables](https://hybridcloudworks.github.io/SimplySoph-SimplySoph/Secrets-and-Variables.html).
 
 ---
 
@@ -99,17 +103,23 @@ VITE_ALGOLIA_SEARCH_KEY=
 │   │   ├── pages/admin/    # Admin-only pages
 │   │   └── const.ts        # App-wide constants
 │   └── public/         # Static assets, fonts
+├── functions/          # Firebase Cloud Functions (TypeScript)
+├── platform/
+│   └── terraform/      # Secret Manager + GitHub OIDC deploy identity
+├── tests/              # Firestore/Storage rules tests, API tests
+├── docs/               # Project docs (docs/wiki/ is the docs site)
 ├── .github/
 │   └── workflows/
 │       ├── deploy.yml              # Build + Firebase deploy
 │       ├── lighthouse.yml          # Lighthouse performance audit
-│       ├── firebase-hosting-merge.yml
-│       └── firebase-hosting-pull-request.yml
+│       └── pages.yml               # Docs site (GitHub Pages)
 ├── lighthouserc.cjs    # Lighthouse CI configuration
 ├── vite.config.ts
 ├── package.json
 ├── CHANGELOG.md
-├── TODO.md
+├── todo.md
+├── LICENSE
+├── SECURITY.md
 └── README.md
 ```
 
@@ -143,4 +153,4 @@ See [CHANGELOG.md](./CHANGELOG.md) for full version history.
 
 ## License
 
-MIT © SimplySoph
+All rights reserved. See [LICENSE](./LICENSE).
