@@ -1,6 +1,6 @@
 # SimplySoph — Comprehensive Code Review Report
 
-> **Repository:** `saulpatinojr/SimplySoph-SimplySoph`
+> **Repository:** `HybridCloudWorks/SimplySoph-SimplySoph`
 > **Date:** March 2, 2026
 > **Reviewer:** AI Code Review Engineer
 > **Counter-Reviewer:** Senior DevOps / Platform Engineer (Phase 2)
