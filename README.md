@@ -26,7 +26,7 @@
 
 ## Quick Start
 
-**Prerequisites:** Node.js 20 (the version CI uses) and npm.
+**Prerequisites:** Node.js 22 (the version CI and Cloud Functions use) and npm.
 
 ```bash
 # 1. Clone
