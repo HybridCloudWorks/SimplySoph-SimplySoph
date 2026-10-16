@@ -210,16 +210,17 @@ issues:
 
 ## 10) Technical Documentation Resources
 
-We have established a series of refined technical blog posts for future reference:
+A series of technical blog posts was planned for future reference. The posts
+were never added to this repository, so only their titles are listed here:
 
 1.  **Foundation**:
-    [Enabling Google Sign-In in Firebase](./blog/2026-02-27-enabling-google-sign-in-firebase.md)
+    Enabling Google Sign-In in Firebase
 2.  **Credentials**:
-    [Creating a Google OAuth Web Client](./blog/2026-02-27-creating-google-oauth-client-gcp.md)
+    Creating a Google OAuth Web Client
 3.  **Domain**:
-    [Linking a Custom Domain to Firebase Hosting](./blog/2026-02-27-linking-custom-domain-and-auth-handler.md)
+    Linking a Custom Domain to Firebase Hosting
 4.  **Production**:
-    [Google Brand Verification & Readiness](./blog/2026-02-27-google-brand-verification-and-testing.md)
+    Google Brand Verification & Readiness
 
 ---
 

@@ -7,9 +7,11 @@
 # never in a local tfvars file, never in a VITE_* build variable.
 # =============================================================================
 
-# gcp_project_id    = "simplysoph-66c78"
-# gcp_region        = "us-central1"
-# github_repository = "saulpatinojr/SimplySoph-SimplySoph"
+# gcp_project_id             = "simplysoph-66c78"
+# gcp_region                 = "us-central1"
+# github_repository          = "HybridCloudWorks/SimplySoph-SimplySoph"
+# github_repository_id       = "1087491686"
+# github_repository_owner_id = "312844660"
 
 # Sensitive TFC workspace variable (HCL checkbox ON, Sensitive checkbox ON):
 # firebase_runtime_secret_values = {

@@ -3,7 +3,7 @@
   "version": "0.2.0-beta",
   "packageManager": "npm@10.9.0",
   "type": "module",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

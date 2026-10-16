@@ -19,9 +19,25 @@ variable "gcp_region" {
 }
 
 variable "github_repository" {
-  description = "GitHub repository (owner/name) allowed to assume the deploy identity via OIDC"
+  description = "GitHub repository (owner/name). Labels the deploy identity only; trust is pinned by the immutable IDs below"
   type        = string
-  default     = "saulpatinojr/SimplySoph-SimplySoph"
+  default     = "HybridCloudWorks/SimplySoph-SimplySoph"
+}
+
+# Immutable IDs: a renamed repository keeps both. A transferred repository
+# keeps its ID but gets the new owner's ID, so update the owner ID first.
+# A deleted and re-created repository with the same name gets a new ID.
+# gh api repos/HybridCloudWorks/SimplySoph-SimplySoph --jq '.id, .owner.id'
+variable "github_repository_id" {
+  description = "Immutable GitHub repository ID allowed to assume the deploy identity via OIDC"
+  type        = string
+  default     = "1087491686"
+}
+
+variable "github_repository_owner_id" {
+  description = "Immutable GitHub owner ID (HybridCloudWorks organization) of that repository"
+  type        = string
+  default     = "312844660"
 }
 
 variable "terraform_run_service_account_email" {

@@ -6,7 +6,6 @@ import { getFirebaseAuth } from "@/lib/firebase";
 const BOOTSTRAP_ADMIN_EMAILS = new Set([
   "sophia@simplysoph.com",
   "administrator@simplysoph.com",
-  "saulpatinojr@gmail.com",
 ]);
 
 function isBootstrapAdminEmail(email: string | null | undefined): boolean {
