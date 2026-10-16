@@ -32,13 +32,17 @@ resource "google_iam_workload_identity_pool_provider" "github_actions" {
   display_name                       = "GitHub Actions OIDC"
 
   attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.repository" = "assertion.repository"
-    "attribute.ref"        = "assertion.ref"
+    "google.subject"          = "assertion.sub"
+    "attribute.repository"    = "assertion.repository"
+    "attribute.repository_id" = "assertion.repository_id"
+    "attribute.ref"           = "assertion.ref"
   }
 
-  # Only this repository may exchange tokens through this provider.
-  attribute_condition = "assertion.repository == '${var.github_repository}'"
+  # Only this repository may exchange tokens through this provider. Pinned by
+  # immutable repository and owner IDs (as SimplySoph-Quince does): a rename
+  # keeps working, and another repository that reuses the name can't get in.
+  # A transfer changes the owner ID; update var.github_repository_owner_id.
+  attribute_condition = "assertion.repository_id == '${var.github_repository_id}' && assertion.repository_owner_id == '${var.github_repository_owner_id}'"
 
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
@@ -52,13 +56,13 @@ resource "google_service_account" "github_deploy" {
   project      = var.gcp_project_id
   account_id   = "github-deploy"
   display_name = "GitHub Actions deploy (WIF)"
-  description  = "Keyless CI deploy identity for saulpatinojr/SimplySoph-SimplySoph"
+  description  = "Keyless CI deploy identity for ${var.github_repository}"
 }
 
 resource "google_service_account_iam_member" "github_actions_can_impersonate" {
   service_account_id = google_service_account.github_deploy.name
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository/${var.github_repository}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_actions.name}/attribute.repository_id/${var.github_repository_id}"
 }
 
 # ---------------------------------------------------------------------------
