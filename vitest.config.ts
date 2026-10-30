@@ -10,6 +10,21 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       // Pin the functions runtime deps to a single copy so vi.mock() in
       // tests/ intercepts the same module that functions/src imports.
+      // Subpath aliases come first — order matters.
+      ...Object.fromEntries(
+        ["app", "app-check", "auth", "firestore"].map((sub) => [
+          `firebase-admin/${sub}`,
+          path.resolve(
+            import.meta.dirname,
+            "functions",
+            "node_modules",
+            "firebase-admin",
+            "lib",
+            sub,
+            "index.js"
+          ),
+        ])
+      ),
       "firebase-admin": path.resolve(
         import.meta.dirname,
         "functions",
@@ -18,6 +33,15 @@ export default defineConfig({
       ),
       // Path aliases bypass the package's exports map, so subpath imports
       // need their own (more specific first — order matters).
+      "firebase-functions/v1": path.resolve(
+        import.meta.dirname,
+        "functions",
+        "node_modules",
+        "firebase-functions",
+        "lib",
+        "v1",
+        "index.js"
+      ),
       "firebase-functions/params": path.resolve(
         import.meta.dirname,
         "functions",

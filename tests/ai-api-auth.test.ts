@@ -30,7 +30,7 @@ const firestoreMocks = vi.hoisted(() => ({
   categoryGet: vi.fn(async () => ({ exists: false, data: () => undefined })),
 }));
 
-vi.mock("firebase-functions", () => {
+vi.mock("firebase-functions/v1", () => {
   const https = {
     onRequest: (handler: unknown) => handler,
     onCall: (handler: unknown) => handler,
@@ -63,7 +63,19 @@ vi.mock("firebase-functions/params", () => ({
   }),
 }));
 
-vi.mock("firebase-admin", () => {
+vi.mock("firebase-admin/app", () => ({
+  initializeApp: vi.fn(),
+}));
+
+vi.mock("firebase-admin/auth", () => ({
+  getAuth: () => authMocks,
+}));
+
+vi.mock("firebase-admin/app-check", () => ({
+  getAppCheck: () => appCheckMocks,
+}));
+
+vi.mock("firebase-admin/firestore", () => {
   const firestoreFn = Object.assign(
     () => ({
       runTransaction: async (
@@ -135,10 +147,9 @@ vi.mock("firebase-admin", () => {
   );
 
   return {
-    initializeApp: vi.fn(),
-    auth: () => authMocks,
-    appCheck: () => appCheckMocks,
-    firestore: firestoreFn,
+    getFirestore: firestoreFn,
+    FieldValue: firestoreFn.FieldValue,
+    Timestamp: firestoreFn.Timestamp,
   };
 });
 
