@@ -1,4 +1,4 @@
-import { Request, Response } from "firebase-functions";
+import { Request, Response } from "firebase-functions/v1";
 import { logInfo, logWarn } from "./telemetry";
 
 export interface InstagramMediaItem {

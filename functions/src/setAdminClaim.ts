@@ -1,5 +1,6 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
+import * as functions from "firebase-functions/v1";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
 /**
  * Callable Cloud Function: setAdminClaim
@@ -48,10 +49,10 @@ export const setAdminClaim = functions.https.onCall(async (data, context) => {
   // 3. Set / remove the custom claim
   try {
     const newClaims = grant ? { role: "admin" } : { role: "user" };
-    await admin.auth().setCustomUserClaims(uid, newClaims);
+    await getAuth().setCustomUserClaims(uid, newClaims);
 
     // 4. Mirror the role into Firestore so the client can read it
-    await admin.firestore().collection("users").doc(uid).set(
+    await getFirestore().collection("users").doc(uid).set(
       { role: grant ? "admin" : "user" },
       { merge: true }
     );
