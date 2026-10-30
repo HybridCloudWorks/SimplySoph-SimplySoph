@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test, { afterEach, beforeEach } from "node:test";
-import type { Request, Response } from "firebase-functions";
+import type { Request, Response } from "firebase-functions/v1";
 import { handleAiGenerate, handlePersonaReplies } from "./ai";
 
 type MockResponse = Response & {

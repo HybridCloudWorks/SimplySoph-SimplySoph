@@ -1,5 +1,8 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
+import * as functions from "firebase-functions/v1";
+import { initializeApp } from "firebase-admin/app";
+import { getAppCheck } from "firebase-admin/app-check";
+import { DecodedIdToken, getAuth } from "firebase-admin/auth";
+import { FieldValue, Timestamp, getFirestore } from "firebase-admin/firestore";
 import { defineSecret } from "firebase-functions/params";
 import algoliasearch from "algoliasearch";
 import crypto from "crypto";
@@ -9,7 +12,7 @@ import { handlePersonaReplies, handleAiGenerate } from "./ai";
 import { logError, logInfo, logWarn } from "./telemetry";
 
 // Initialize Firebase Admin
-admin.initializeApp();
+initializeApp();
 
 // -----------------------------------------------------------------------------
 // Secret Manager bindings (containers managed by Terraform — see
@@ -88,8 +91,7 @@ async function resolveCategoryName(data: any): Promise<string | undefined> {
   if (data.category) return data.category;
   if (data.categoryId) {
     try {
-      const snap = await admin
-        .firestore()
+      const snap = await getFirestore()
         .collection("categories")
         .doc(data.categoryId)
         .get();
@@ -225,8 +227,7 @@ export const onContactMessageCreate = functions.firestore
   .document("contact_messages/{messageId}")
   .onCreate(async (snapshot, context) => {
     const data = snapshot.data();
-    await admin
-      .firestore()
+    await getFirestore()
       .collection("mail")
       .add({
         to: CONTACT_RECIPIENT,
@@ -244,7 +245,7 @@ export const onContactMessageCreate = functions.firestore
           ].join("\n"),
           html: `<p><strong>Name:</strong> ${escapeHtml(data.name)}</p><p><strong>Email:</strong> ${escapeHtml(data.email)}</p><p>${escapeHtml(data.message).replace(/\n/g, "<br>")}</p>`,
         },
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       });
   });
 
@@ -407,7 +408,7 @@ async function sendNewsletterDoubleOptInEmail(
     email
   )}&token=${encodeURIComponent(confirmToken)}`;
 
-  await admin.firestore().collection("mail").add({
+  await getFirestore().collection("mail").add({
     to: email,
     from: NEWSLETTER_FROM,
     message: {
@@ -424,7 +425,7 @@ async function sendNewsletterDoubleOptInEmail(
         leadMagnet ? `<p>Requested bonus: <strong>${escapeHtml(leadMagnet)}</strong></p>` : ""
       }<p><a href="${confirmLink}">Confirm subscription</a></p>`,
     },
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 }
 
@@ -437,7 +438,7 @@ async function sendNewsletterWelcomeEmail(
     email
   )}&token=${encodeURIComponent(unsubscribeToken)}`;
 
-  await admin.firestore().collection("mail").add({
+  await getFirestore().collection("mail").add({
     to: email,
     from: NEWSLETTER_FROM,
     message: {
@@ -454,7 +455,7 @@ async function sendNewsletterWelcomeEmail(
         leadMagnet ? `<p>Requested bonus: <strong>${escapeHtml(leadMagnet)}</strong></p>` : ""
       }<p><a href="${unsubscribeLink}">Unsubscribe</a></p>`,
     },
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 }
 
@@ -545,7 +546,7 @@ async function isAllowedInRateWindow(
   windowMs: number,
   maxRequests: number
 ): Promise<boolean> {
-  const db = admin.firestore();
+  const db = getFirestore();
   // Sanitize key for use as a Firestore document ID
   const safeKey = key.replace(/[^a-zA-Z0-9:._-]/g, "_").slice(0, 1500);
   const ref = db.collection("_rateLimits").doc(safeKey);
@@ -558,7 +559,7 @@ async function isAllowedInRateWindow(
       const pruned = existing.filter((ts: number) => ts > windowStart);
       // expiresAt drives the Firestore TTL policy on _rateLimits so stale
       // keys are garbage-collected instead of accumulating forever.
-      const expiresAt = admin.firestore.Timestamp.fromMillis(now + windowMs * 2);
+      const expiresAt = Timestamp.fromMillis(now + windowMs * 2);
 
       if (pruned.length >= maxRequests) {
         tx.set(ref, { ts: pruned, updatedAt: now, expiresAt });
@@ -597,7 +598,7 @@ async function enforcePublicWriteAccess(
     }
 
     try {
-      await admin.appCheck().verifyToken(appCheckToken);
+      await getAppCheck().verifyToken(appCheckToken);
     } catch {
       res.status(401).json({ error: "Invalid App Check token" });
       return false;
@@ -617,11 +618,11 @@ async function enforcePublicWriteAccess(
 
 async function verifyOptionalUser(
   req: functions.https.Request
-): Promise<admin.auth.DecodedIdToken | null> {
+): Promise<DecodedIdToken | null> {
   const idToken = parseBearerToken(req.headers.authorization as string | undefined);
   if (!idToken) return null;
   try {
-    return await admin.auth().verifyIdToken(idToken);
+    return await getAuth().verifyIdToken(idToken);
   } catch {
     return null;
   }
@@ -630,7 +631,7 @@ async function verifyOptionalUser(
 async function requireAuthenticatedUser(
   req: functions.https.Request,
   res: functions.Response
-): Promise<admin.auth.DecodedIdToken | null> {
+): Promise<DecodedIdToken | null> {
   const idToken = parseBearerToken(req.headers.authorization as string | undefined);
   if (!idToken) {
     res.status(401).json({ error: "Missing Firebase ID token" });
@@ -638,7 +639,7 @@ async function requireAuthenticatedUser(
   }
 
   try {
-    return await admin.auth().verifyIdToken(idToken);
+    return await getAuth().verifyIdToken(idToken);
   } catch {
     res.status(401).json({ error: "Invalid Firebase ID token" });
     return null;
@@ -675,7 +676,7 @@ async function handleNewsletterSubscribe(req: functions.https.Request, res: func
     return;
   }
 
-  const col = admin.firestore().collection("newsletterSubscribers");
+  const col = getFirestore().collection("newsletterSubscribers");
   const existing = await col.where("email", "==", email).limit(1).get();
 
   if (!existing.empty) {
@@ -689,22 +690,22 @@ async function handleNewsletterSubscribe(req: functions.https.Request, res: func
     await target.set(
       {
         email,
-        name: name || admin.firestore.FieldValue.delete(),
+        name: name || FieldValue.delete(),
         source,
         interests,
-        leadMagnet: leadMagnet || admin.firestore.FieldValue.delete(),
+        leadMagnet: leadMagnet || FieldValue.delete(),
         consentAt: consentAccepted
-          ? admin.firestore.FieldValue.serverTimestamp()
-          : admin.firestore.FieldValue.delete(),
+          ? FieldValue.serverTimestamp()
+          : FieldValue.delete(),
         consentVersion,
         attribution,
         lifecycleStage: "confirmation-pending",
         lastLifecycleEvent: "resubscribe_pending_confirm",
         active: false,
         status: "pending_confirm",
-        resubscribedAt: admin.firestore.FieldValue.serverTimestamp(),
-        confirmationRequestedAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        resubscribedAt: FieldValue.serverTimestamp(),
+        confirmationRequestedAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
@@ -719,16 +720,16 @@ async function handleNewsletterSubscribe(req: functions.https.Request, res: func
     source,
     interests,
     leadMagnet: leadMagnet || null,
-    consentAt: consentAccepted ? admin.firestore.FieldValue.serverTimestamp() : null,
+    consentAt: consentAccepted ? FieldValue.serverTimestamp() : null,
     consentVersion,
     attribution,
     lifecycleStage: "confirmation-pending",
     lastLifecycleEvent: "subscribe_pending_confirm",
     active: false,
     status: "pending_confirm",
-    confirmationRequestedAt: admin.firestore.FieldValue.serverTimestamp(),
-    subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    confirmationRequestedAt: FieldValue.serverTimestamp(),
+    subscribedAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 
   await sendNewsletterDoubleOptInEmail(email, leadMagnet || undefined);
@@ -741,7 +742,7 @@ async function applyNewsletterUnsubscribe(emailRaw: unknown, tokenRaw: unknown):
   if (!email || !isValidEmail(email)) return false;
   if (!token || !verifyUnsubscribeToken(email, token)) return false;
 
-  const col = admin.firestore().collection("newsletterSubscribers");
+  const col = getFirestore().collection("newsletterSubscribers");
   const existing = await col.where("email", "==", email).get();
   await Promise.all(
     existing.docs.map(docSnap =>
@@ -749,8 +750,8 @@ async function applyNewsletterUnsubscribe(emailRaw: unknown, tokenRaw: unknown):
         {
           active: false,
           status: "unsubscribed",
-          unsubscribedAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          unsubscribedAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true }
       )
@@ -790,7 +791,7 @@ async function applyNewsletterConfirm(emailRaw: unknown, tokenRaw: unknown): Pro
   if (!email || !isValidEmail(email)) return false;
   if (!token || !verifyNewsletterConfirmToken(email, token)) return false;
 
-  const col = admin.firestore().collection("newsletterSubscribers");
+  const col = getFirestore().collection("newsletterSubscribers");
   const existing = await col.where("email", "==", email).limit(1).get();
   if (existing.empty) return false;
 
@@ -803,12 +804,12 @@ async function applyNewsletterConfirm(emailRaw: unknown, tokenRaw: unknown): Pro
       {
         active: true,
         status: "active",
-        confirmedAt: admin.firestore.FieldValue.serverTimestamp(),
+        confirmedAt: FieldValue.serverTimestamp(),
         lifecycleStage: targetData.leadMagnet
           ? "lead-magnet-requested"
           : "subscribed",
         lastLifecycleEvent: "confirmed",
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
@@ -821,12 +822,12 @@ async function applyNewsletterConfirm(emailRaw: unknown, tokenRaw: unknown): Pro
 
   await target.set(
     {
-      welcomeEmailSentAt: admin.firestore.FieldValue.serverTimestamp(),
+      welcomeEmailSentAt: FieldValue.serverTimestamp(),
       lifecycleStage: targetData.leadMagnet
         ? "welcome-with-lead-magnet-sent"
         : "welcome-sent",
       lastLifecycleEvent: "welcome_email_sent",
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     },
     { merge: true }
   );
@@ -883,7 +884,7 @@ async function handleAttributionEvent(req: functions.https.Request, res: functio
     .update(`${UNSUBSCRIBE_TOKEN_SECRET}:${getClientIp(req)}`)
     .digest("hex")
     .slice(0, 32);
-  await admin.firestore().collection("attributionEvents").add({
+  await getFirestore().collection("attributionEvents").add({
     eventType,
     subjectType: subjectType || null,
     subjectId: subjectId || null,
@@ -892,8 +893,8 @@ async function handleAttributionEvent(req: functions.https.Request, res: functio
     metadata,
     userId: decoded?.uid || null,
     ipHash,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    expiresAt: admin.firestore.Timestamp.fromMillis(
+    createdAt: FieldValue.serverTimestamp(),
+    expiresAt: Timestamp.fromMillis(
       Date.now() + 90 * 24 * 60 * 60 * 1000
     ),
   });
@@ -913,7 +914,7 @@ async function handlePassportSave(req: functions.https.Request, res: functions.R
     return;
   }
 
-  const userRef = admin.firestore().collection("users").doc(decoded.uid);
+  const userRef = getFirestore().collection("users").doc(decoded.uid);
   const userDoc = await userRef.get();
   const existing = (userDoc.data()?.preferences?.savedDestinationIds as unknown[] | undefined) || [];
   if (existing.length >= MAX_SAVED_DESTINATIONS && !existing.includes(destinationId)) {
@@ -924,7 +925,7 @@ async function handlePassportSave(req: functions.https.Request, res: functions.R
   await userRef.set(
     {
       preferences: {
-        savedDestinationIds: admin.firestore.FieldValue.arrayUnion(destinationId),
+        savedDestinationIds: FieldValue.arrayUnion(destinationId),
       },
     },
     { merge: true }
@@ -943,14 +944,13 @@ async function handlePassportUnsave(req: functions.https.Request, res: functions
     return;
   }
 
-  await admin
-    .firestore()
+  await getFirestore()
     .collection("users")
     .doc(decoded.uid)
     .set(
       {
         preferences: {
-          savedDestinationIds: admin.firestore.FieldValue.arrayRemove(destinationId),
+          savedDestinationIds: FieldValue.arrayRemove(destinationId),
         },
       },
       { merge: true }
@@ -963,7 +963,7 @@ async function handlePassportSaved(req: functions.https.Request, res: functions.
   const decoded = await requireAuthenticatedUser(req, res);
   if (!decoded) return;
 
-  const userDoc = await admin.firestore().collection("users").doc(decoded.uid).get();
+  const userDoc = await getFirestore().collection("users").doc(decoded.uid).get();
   const saved =
     (userDoc.data()?.preferences?.savedDestinationIds as unknown[] | undefined)
       ?.filter((value): value is string => typeof value === "string") || [];
@@ -991,14 +991,14 @@ async function handleContactSubmit(req: functions.https.Request, res: functions.
     return;
   }
 
-  await admin.firestore().collection("contact_messages").add({
+  await getFirestore().collection("contact_messages").add({
     name,
     email,
     subject,
     message,
     status: "unread",
     source: sanitizeOptionalText(req.body?.source, 120) || "web-contact",
-    submittedAt: admin.firestore.FieldValue.serverTimestamp(),
+    submittedAt: FieldValue.serverTimestamp(),
   });
 
   res.status(200).json({ ok: true });
@@ -1043,7 +1043,7 @@ async function handleCommentCreate(req: functions.https.Request, res: functions.
     return;
   }
 
-  const docRef = await admin.firestore().collection("comments").add({
+  const docRef = await getFirestore().collection("comments").add({
     postId,
     postType,
     content,
@@ -1052,7 +1052,7 @@ async function handleCommentCreate(req: functions.https.Request, res: functions.
     authorName: decodedUser?.name || guestName || "Guest",
     authorPhotoURL: decodedUser?.picture || null,
     status: "pending",
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 
   res.status(200).json({ ok: true, id: docRef.id });
@@ -1074,9 +1074,9 @@ async function enforceAiAccess(
     return null;
   }
 
-  let decoded: admin.auth.DecodedIdToken;
+  let decoded: DecodedIdToken;
   try {
-    decoded = await admin.auth().verifyIdToken(idToken);
+    decoded = await getAuth().verifyIdToken(idToken);
   } catch {
     res.status(401).json({ error: "Invalid Firebase ID token" });
     return null;
@@ -1098,7 +1098,7 @@ async function enforceAiAccess(
     }
 
     try {
-      await admin.appCheck().verifyToken(appCheckToken);
+      await getAppCheck().verifyToken(appCheckToken);
     } catch {
       res.status(401).json({ error: "Invalid App Check token" });
       return null;
@@ -1160,7 +1160,7 @@ async function handleIntegrationsHealth(
 
   // Live Firestore round-trip
   try {
-    await admin.firestore().collection("blogPosts").limit(1).get();
+    await getFirestore().collection("blogPosts").limit(1).get();
     checks.firestore.ok = true;
   } catch (error) {
     checks.firestore.ok = false;

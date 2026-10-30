@@ -1,4 +1,4 @@
-import { Request, Response } from "firebase-functions";
+import { Request, Response } from "firebase-functions/v1";
 import { logError, logInfo, logWarn } from "./telemetry";
 
 type Persona = "preppy" | "sporty" | "sophisticated" | "chaotic";
