@@ -10,30 +10,8 @@ import MetaTags from '@/components/MetaTags';
 import { toast } from 'sonner';
 import { Mail, Instagram, Youtube, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import { submitContactMessage } from '@/lib/services/contact';
+import { socialHandle, useSiteConfig } from '@/contexts/SiteConfigContext';
 
-// Social media links — update these when real handles are confirmed
-const SOCIAL = [
-  {
-    label: 'Email',
-    value: 'hello@simplysoph.com',
-    href: 'mailto:hello@simplysoph.com',
-    icon: Mail,
-  },
-  {
-    label: 'Instagram',
-    value: '@simplysoph',
-    href: 'https://instagram.com/simplysoph',
-    icon: Instagram,
-    external: true,
-  },
-  {
-    label: 'YouTube',
-    value: 'SimplySoph',
-    href: 'https://youtube.com/@simplysoph',
-    icon: Youtube,
-    external: true,
-  },
-];
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -45,6 +23,29 @@ interface FormData {
 }
 
 export default function Contact() {
+  const { social } = useSiteConfig();
+  const SOCIAL = [
+    {
+      label: 'Email',
+      value: social.email,
+      href: `mailto:${social.email}`,
+      icon: Mail,
+    },
+    {
+      label: 'Instagram',
+      value: socialHandle(social.instagram),
+      href: social.instagram,
+      icon: Instagram,
+      external: true,
+    },
+    {
+      label: 'YouTube',
+      value: socialHandle(social.youtube),
+      href: social.youtube,
+      icon: Youtube,
+      external: true,
+    },
+  ];
   const [form, setForm] = useState<FormData>({
     name:    '',
     email:   '',

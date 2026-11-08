@@ -121,7 +121,7 @@ export default function AIPersonaComments({
           fanComments: fanComments.slice(0, 5),
           creatorName: "Soph",
           creatorBio:
-            "Fashion, lifestyle, and creative content for the modern generation. 18-year-old creator who loves style, travel, and authentic storytelling.",
+            "Fashion, lifestyle, and creative content for the modern generation. Gen-Z creator who loves style, travel, and authentic storytelling.",
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

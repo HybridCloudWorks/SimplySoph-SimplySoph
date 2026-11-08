@@ -2,7 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getSiteConfig, type SiteConfig } from "@/lib/content";
 import { queryKeys } from "@/lib/queryKeys";
-import { APP_TITLE, APP_LOGO, TIKTOK_PROFILE_URL } from "@/const";
+import { APP_TITLE, APP_LOGO, SOCIAL_PROFILE_URLS } from "@/const";
 
 /**
  * Baseline config mirroring what was hardcoded before the siteConfig
@@ -39,10 +39,10 @@ export const SITE_CONFIG_DEFAULTS: SiteConfig = {
     ],
   },
   social: {
-    tiktok: TIKTOK_PROFILE_URL,
-    instagram: "https://www.instagram.com/simplysoph",
-    youtube: "https://www.youtube.com/@simplysoph",
-    pinterest: "https://www.pinterest.com/simplysoph",
+    tiktok: SOCIAL_PROFILE_URLS.tiktok,
+    instagram: SOCIAL_PROFILE_URLS.instagram,
+    youtube: SOCIAL_PROFILE_URLS.youtube,
+    pinterest: SOCIAL_PROFILE_URLS.pinterest,
     email: "hello@simplysoph.com",
   },
   seo: {
@@ -80,6 +80,21 @@ export function resolveSiteConfig(remote: Partial<SiteConfig>): SiteConfig {
     resolved[section] = merged as never;
   }
   return resolved;
+}
+
+/**
+ * Display handle ("@smply.soph") for a social profile URL, so the visible
+ * text always matches the link — including when an admin overrides the URL.
+ * Returns "" when the URL has no handle path.
+ */
+export function socialHandle(profileUrl: string | undefined): string {
+  if (!profileUrl) return "";
+  try {
+    const first = new URL(profileUrl).pathname.split("/").filter(Boolean)[0];
+    return first ? `@${first.replace(/^@/, "")}` : "";
+  } catch {
+    return "";
+  }
 }
 
 const SiteConfigContext = createContext<SiteConfig>(SITE_CONFIG_DEFAULTS);

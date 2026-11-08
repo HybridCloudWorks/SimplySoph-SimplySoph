@@ -32,8 +32,30 @@ export const ANDROID_APP_URL =
 export const TIKTOK_VIDEO_ID =
   import.meta.env.VITE_TIKTOK_VIDEO_ID?.trim() || "";
 
+/**
+ * Soph's social profiles — the single source of truth for every handle and
+ * profile link on the site. Components must read these through
+ * `useSiteConfig().social` (which lets an admin override them in Firestore)
+ * and `socialHandle()` for display text; never hard-code a handle.
+ *
+ * Verified 2026-11-08 (issue #63):
+ *   - YouTube  @smplysoph   → "soph!! 🌅🛍️". (@simplysoph is a different
+ *     person's channel; @smply.soph does not exist.)
+ *   - Pinterest smplysoph   → "soph ! 🐾". (The "simplysoph" Pinterest
+ *     profile is a different person.)
+ *   - Instagram smply.soph and TikTok @smply.soph confirmed by the owner.
+ * `client/src/lib/socialHandles.test.ts` fails the build if a retired
+ * handle reappears anywhere in client/src.
+ */
+export const SOCIAL_PROFILE_URLS = {
+  instagram: "https://www.instagram.com/smply.soph",
+  youtube: "https://www.youtube.com/@smplysoph",
+  tiktok: "https://www.tiktok.com/@smply.soph",
+  pinterest: "https://www.pinterest.com/smplysoph",
+} as const;
+
 /** Full TikTok profile URL for external links */
-export const TIKTOK_PROFILE_URL = "https://www.tiktok.com/@smply.soph";
+export const TIKTOK_PROFILE_URL = SOCIAL_PROFILE_URLS.tiktok;
 
 /** YouTube live video ID — update whenever Soph goes live; empty string = offline */
 export const YOUTUBE_LIVE_VIDEO_ID =
