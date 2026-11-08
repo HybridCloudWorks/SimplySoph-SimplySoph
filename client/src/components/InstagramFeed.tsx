@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Instagram, ExternalLink, Youtube } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE } from "@/const";
+import { socialHandle, useSiteConfig } from "@/contexts/SiteConfigContext";
 
 interface InstagramPost {
   id: string;
@@ -73,6 +74,7 @@ export default function InstagramFeed({
   posts?: InstagramPost[];
   maxItems?: number;
 }) {
+  const { social } = useSiteConfig();
   const { data: fetchedPosts } = useQuery({
     queryKey: ["instagram", "media", maxItems],
     queryFn: () => fetchInstagramPosts(maxItems),
@@ -105,14 +107,14 @@ export default function InstagramFeed({
             <Card className="p-8 text-center flex flex-col h-full hover:shadow-md transition-shadow">
               <Instagram size={48} className="mx-auto text-primary mb-4" />
               <h3 className="font-heading font-bold text-lg mb-2">
-                @simply.soph
+                {socialHandle(social.instagram)}
               </h3>
               <p className="text-muted-foreground text-sm mb-6 flex-grow">
                 Follow for daily outfit inspo, travels, and behind-the-scenes
                 content.
               </p>
               <a
-                href="https://www.instagram.com/simply.soph"
+                href={social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 btn-gold px-6 py-2.5 rounded-full text-white font-medium text-sm mt-auto hover:-translate-y-0.5 transition-transform"
@@ -125,13 +127,13 @@ export default function InstagramFeed({
             <Card className="p-8 text-center flex flex-col h-full hover:shadow-md transition-shadow">
               <Youtube size={48} className="mx-auto text-red-600 mb-4" />
               <h3 className="font-heading font-bold text-lg mb-2">
-                @smplysoph
+                {socialHandle(social.youtube)}
               </h3>
               <p className="text-muted-foreground text-sm mb-6 flex-grow">
                 Watch full vlogs, styling guides, and detailed lifestyle videos.
               </p>
               <a
-                href="https://www.youtube.com/@smplysoph"
+                href={social.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 px-6 py-2.5 rounded-full text-white font-medium text-sm mt-auto hover:-translate-y-0.5 transition-all"
@@ -147,13 +149,13 @@ export default function InstagramFeed({
                 className="mx-auto text-black dark:text-white mb-4"
               />
               <h3 className="font-heading font-bold text-lg mb-2">
-                @smply.soph
+                {socialHandle(social.tiktok)}
               </h3>
               <p className="text-muted-foreground text-sm mb-6 flex-grow">
                 Catch quick tips, trending sounds, and short-form fun.
               </p>
               <a
-                href="https://www.tiktok.com/@smply.soph"
+                href={social.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-black dark:bg-white dark:text-black dark:hover:bg-gray-200 hover:bg-gray-800 px-6 py-2.5 rounded-full text-white font-medium text-sm mt-auto hover:-translate-y-0.5 transition-all"
@@ -173,14 +175,14 @@ export default function InstagramFeed({
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-heading font-bold mb-1">
-              @smply.soph
+              {socialHandle(social.instagram)}
             </h2>
             <p className="text-muted-foreground text-sm">
               Latest from Instagram
             </p>
           </div>
           <a
-            href="https://www.instagram.com/smply.soph"
+            href={social.instagram}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-primary font-medium flex items-center gap-1"

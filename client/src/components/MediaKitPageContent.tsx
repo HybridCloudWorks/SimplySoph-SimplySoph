@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { MEDIA_KIT_OFFERINGS, MEDIA_KIT_PROOF_POINTS } from "@/lib/services/growth";
 import MediaKitInquiryForm from "@/components/MediaKitInquiryForm";
+import { socialHandle, useSiteConfig } from "@/contexts/SiteConfigContext";
 
 const proofChips = [
   { label: "Travel + style storytelling", icon: MapPin },
@@ -25,28 +26,15 @@ const proofChips = [
   { label: "Clear disclosure workflow", icon: CheckCircle2 },
 ];
 
-const platforms = [
-  {
-    name: "Instagram",
-    handle: "@smply.soph",
-    url: "https://www.instagram.com/smply.soph",
-    icon: Instagram,
-  },
-  {
-    name: "YouTube",
-    handle: "@smply.soph",
-    url: "https://www.youtube.com/@smply.soph",
-    icon: Youtube,
-  },
-  {
-    name: "TikTok",
-    handle: "@smply.soph",
-    url: "https://www.tiktok.com/@smply.soph",
-    icon: Camera,
-  },
-];
 
 export default function MediaKitPageContent() {
+  const { social } = useSiteConfig();
+  const platforms = [
+    { name: "Instagram", url: social.instagram, icon: Instagram },
+    { name: "YouTube", url: social.youtube, icon: Youtube },
+    { name: "TikTok", url: social.tiktok, icon: Camera },
+  ].map(platform => ({ ...platform, handle: socialHandle(platform.url) }));
+
   return (
     <div className="min-h-screen flex flex-col">
       <MetaTags

@@ -4,8 +4,10 @@ import Footer from "@/components/Footer";
 import MetaTags from "@/components/MetaTags";
 import { Sparkles, Heart, Camera, Instagram, Youtube, Mail } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { useSiteConfig } from "@/contexts/SiteConfigContext";
 
 export default function About() {
+  const { social } = useSiteConfig();
   return (
     <div className="min-h-screen flex flex-col">
       <MetaTags
@@ -102,7 +104,7 @@ export default function About() {
                 {/* Connect Icons */}
                 <div className="mt-8 flex items-center justify-center gap-6">
                   <a
-                    href="https://www.tiktok.com/@smply.soph"
+                    href={social.tiktok}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
@@ -111,7 +113,7 @@ export default function About() {
                     <TikTokIcon size={22} />
                   </a>
                   <a
-                    href="https://www.instagram.com/simply.soph"
+                    href={social.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
@@ -120,7 +122,7 @@ export default function About() {
                     <Instagram size={22} />
                   </a>
                   <a
-                    href="https://www.youtube.com/@smplysoph"
+                    href={social.youtube}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"
